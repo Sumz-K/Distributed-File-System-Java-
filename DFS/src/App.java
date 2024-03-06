@@ -5,10 +5,10 @@ import org.json.JSONObject;
 public class App {
     public static void main(String[] args) throws IOException, JSONException {
         request object = new request();
-        String url = "https://dummy.restapiexample.com/api/v1/create";
+        String url = "http://192.168.0.108:8080/uploadfile";
         JSONObject postis = new JSONObject();
         postis.put("key", "Value");
-        object.post(url,postis);
-        System.out.println(object.reply_in_json());
+        object.post(url,"one.txt");
+        System.out.println(object.reply_in_string());
     }
 }
