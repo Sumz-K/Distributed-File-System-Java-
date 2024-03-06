@@ -1,0 +1,14 @@
+docker commands
+
+build = docker-compose up
+
+run = docker exec -it ea3d958fc7e3 /bin/bash
+
+force kill
+get pid = docker inspect --format '{{.State.Pid}}' <container_id_or_name>
+
+
+kill = sudo kill <pid>
+
+
+
