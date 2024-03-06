@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  datanode1:
+    image: datanode:v1
+    command: /bin/bash -c "while true; do sleep 86400; done"
+    ports:
+      - "8080:8080"
+    networks:
+      data-bridge:
+        ipv4_address: 172.18.0.11
+
+  datanode2:
+    image: datanode:v1
+    command: /bin/bash -c "while true; do sleep 86400; done"
+    ports:
+      - "8081:8080"  # Changed the host port to 8081
+    networks:
+      data-bridge:
+        ipv4_address: 172.18.0.10
+
+networks:
+  data-bridge:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
+
