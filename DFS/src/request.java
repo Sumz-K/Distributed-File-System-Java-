@@ -128,8 +128,5 @@ public class request {
 
     }
     
-    public String reply_in_string() {
-        return reply;
-    }
     
 }
