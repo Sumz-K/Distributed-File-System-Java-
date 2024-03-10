@@ -10,5 +10,6 @@ get pid = docker inspect --format '{{.State.Pid}}' <container_id_or_name>
 
 kill = sudo kill <pid>
 
+docker run -p 8080:8080 <image>
 
 
