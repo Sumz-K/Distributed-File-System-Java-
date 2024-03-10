@@ -1,9 +1,12 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.OutputStream;
+
+import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
@@ -27,6 +30,10 @@ class Datanode {
     public byte[] retrieveFile(String filename) {
         //System.out.print("here now\n");
         return store.retrieve(filename);
+    }
+
+    public String writeFile(String filename,String location){
+        return store.writeFile(filename,location);
     }
 
     public String getName() {
@@ -82,6 +89,42 @@ class DatanodeStore {
             return fileContents;
         } catch (IOException e) {
             return null;
+        }
+    }
+
+
+    public String writeFile(String file,String location){
+        //location is where i write the file to
+        //File outPutFile = File.createTempFile("temp-", "-unsplit", new File(location));
+        String filename=path+file;
+        
+        try{
+            ProcessBuilder processBuilder = new ProcessBuilder("cat", filename);
+            Process process = processBuilder.start();
+            InputStream inputStream = process.getInputStream();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            byte[] fileContents = outputStream.toByteArray();
+
+            writehelper(fileContents,location);
+
+            return "Succesful";
+        }
+        catch (IOException e) {
+           return "Write unsuccessful";
+        }
+    }
+    private void writehelper(byte[] contents,String location){
+        try (FileOutputStream fos = new FileOutputStream(location)) {
+            fos.write(contents);
+            System.out.println("Data written to file successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
@@ -148,10 +191,22 @@ class DatanodeServer {
                 requestBodyBuilder.append(line);
             }
             String requestBodyString = requestBodyBuilder.toString();
-            System.out.print(requestBodyString);
+            //System.out.print(requestBodyString);
+            //System.out.print(requestBodyString);
+
+            String writepath="";
+            String[] parts = requestBodyString.split(":", 2);
+
+
+            String prefix_path="/Users/sumukhkowndinya/Desktop/Dummyfiles/written_files/";
+            writepath=prefix_path+parts[1];
+            
+            String file_to_be_written=parts[0];
+            System.out.println(writepath);
             // Access the Datanode instance from the enclosing class DatanodeServer
-            byte[] buffer = datanode.retrieveFile(requestBodyString);
-            sendResponse(exchange, buffer);
+            datanode.writeFile(file_to_be_written,writepath);
+             byte[] dummy_resp={};
+            sendResponse(exchange, dummy_resp);
         }
         
 
@@ -162,6 +217,7 @@ class DatanodeServer {
                 os.write(response);
             }
         }
+
     }
 }
 
