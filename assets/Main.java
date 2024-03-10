@@ -8,7 +8,7 @@ import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-
+import java.net.URLDecoder;
 class Datanode {
     private String name;
     private String ip;
@@ -108,8 +108,33 @@ class DatanodeServer {
             if ("POST".equals(exchange.getRequestMethod())) {
                 handlePostRequest(exchange);
             } else if ("GET".equals(exchange.getRequestMethod())) {
-                // handleGetRequest(exchange);
+                handleGetRequest(exchange);
             }
+        }
+
+        private void handleGetRequest(HttpExchange exchange) throws IOException{
+            String uri=exchange.getRequestURI().toString();
+            //System.out.print(uri);
+
+            //http://192.168.1.2:6000/fetchfile?filename=eight_kb.jpeg
+            String file="";
+            String[] parts = uri.split("\\?", 2);
+            if (parts.length == 2) {
+                String params = parts[1];
+                String[] key_val = params.split("=", 2);
+                if (key_val.length == 2 && key_val[0].equals("filename")) {
+                    try{
+                    file = URLDecoder.decode(key_val[1], "UTF-8");
+                    //System.out.print(file);
+                    }
+                    catch(Exception e){
+                        System.out.print(e);
+                    }
+                }
+            }
+            byte[] data=datanode.retrieveFile(file);
+            sendResponse(exchange, data);
+
         }
 
         private void handlePostRequest(HttpExchange exchange) throws IOException {
