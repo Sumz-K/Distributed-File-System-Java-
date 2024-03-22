@@ -1,14 +1,24 @@
-import java.io.IOException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
+class DummyClass {
+    static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+}
 public class App {
-    public static void main(String[] args) throws IOException, JSONException {
-        request object = new request();
-        String url = "http://192.168.0.112:8081/uploadfile";
-        JSONObject postis = new JSONObject();
-        postis.put("key", "Value");
-        object.post(url, "temp-9146621541785134506-split");
-        System.out.println(object.reply_in_text());
+    public static void main(String[] args) throws Exception {
+        ArrayList<String> datanodes = new ArrayList<String>();
+        datanodes.add("https://datanode1.run-ap-south1.goorm.site/fetchfile");
+        datanodes.add("https://datanode2.run-ap-south1.goorm.site/fetchfile");
+        datanodes.add("https://datanode5.run-ap-south1.goorm.site/fetchfile");
+        datanodes.add("https://datanode6.run-ap-south1.goorm.site/fetchfile");
+        
+
+        manage_server server = new manage_server(datanodes);
+        server.startServer();
     }
 }

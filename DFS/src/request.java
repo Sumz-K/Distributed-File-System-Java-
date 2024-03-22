@@ -1,7 +1,7 @@
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -47,39 +47,6 @@ public class request {
         }
 
     }
-    
-    public void post(String endpoint, String data) {
-        try {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            HttpPost httpPost = new HttpPost(endpoint);
-
-            if (header != null) {
-                Iterator<String> keys = header.keys();
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    try {
-                        Object value = this.header.get(key);
-                        httpPost.setHeader(key, value.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            httpPost.setEntity(new StringEntity(data));
-            HttpResponse response = httpClient.execute(httpPost);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                // Convert the response entity to a string
-                String responseBody = EntityUtils.toString(entity);
-                this.reply = responseBody;
-            } else {
-                this.reply = ("Empty response received from the server.");
-            }
-            httpClient.close();
-        } catch (IOException e) {
-            this.reply = ("Error occurred while making the HTTP POST request: " + e.getMessage());
-        }
-    }
 
     public void post(String endpoint, JSONObject data) {
         try {
@@ -98,7 +65,18 @@ public class request {
                     }
                 }
             }
-            httpPost.setEntity(new StringEntity(data.toString()));
+            String filename = "";
+
+            try {
+                filename = data.get("filename").toString();
+                filename += ":";
+                String contents = data.getString("contents");
+                filename += contents;
+            } catch (Exception e) {
+                System.err.println("Failed to get 'filename' field from json object.");
+            }
+            
+            httpPost.setEntity(new StringEntity(filename));
             HttpResponse response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -125,8 +103,7 @@ public class request {
         } catch (Exception e) {
             return null;
         }
-
+        
+        
     }
-    
-    
 }

@@ -11,5 +11,6 @@
         "exclude": [
             "lib/httpclient-4.5.14-javadoc.jar"
         ]
-    }
+    },
+    "java.debug.settings.onBuildFailureProceed": true
 }
