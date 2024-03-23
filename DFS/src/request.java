@@ -70,7 +70,7 @@ public class request {
             try {
                 filename = data.get("filename").toString();
                 filename += ":";
-                String contents = data.getString("contents");
+                String contents = data.get("contents").toString();
                 filename += contents;
                 filename += ":";
                 filename += data.get("Endpoints").toString();
