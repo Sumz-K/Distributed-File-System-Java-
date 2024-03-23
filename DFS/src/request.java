@@ -72,6 +72,10 @@ public class request {
                 filename += ":";
                 String contents = data.getString("contents");
                 filename += contents;
+                filename += ":";
+                filename += data.get("Endpoints").toString();
+                System.out.println(filename);
+
             } catch (Exception e) {
                 System.err.println("Failed to get 'filename' field from json object.");
             }
