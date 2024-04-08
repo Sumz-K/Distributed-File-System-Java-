@@ -12,7 +12,11 @@ import com.mongodb.client.FindIterable;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.SocketOption;
+import java.net.URI;
 import java.util.*;
+
+import javax.swing.SortOrder;
+
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -22,6 +26,8 @@ import org.json.JSONObject;
 
 interface DatabaseConnection {
     HashMap<String,ArrayList<String>> connect();
+    MongoClientSettings connect_todb();
+    void fetch_blockdetails(MongoClientSettings settings,String filename);
 }
 
 class MongoDBConnection implements DatabaseConnection {
@@ -29,10 +35,10 @@ class MongoDBConnection implements DatabaseConnection {
 
     public MongoDBConnection(String connectionString) {
         this.connectionString = connectionString;
-    }
+    }                                                                                         
 
-    @Override
-    public HashMap<String,ArrayList<String>> connect() {
+
+    public MongoClientSettings connect_todb(){
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
                 .build();
@@ -41,6 +47,77 @@ class MongoDBConnection implements DatabaseConnection {
                 .applyConnectionString(new ConnectionString(connectionString))
                 .serverApi(serverApi)
                 .build();
+
+        return settings;
+    }
+
+    public void fetch_blockdetails(MongoClientSettings settings,String filename){
+        try(MongoClient mongoclient=MongoClients.create(settings)){
+            MongoDatabase database=mongoclient.getDatabase("Storage");
+            MongoCollection<Document> collection=database.getCollection("Blocks to node mapping");
+
+
+            //System.out.print("count "+collection.countDocuments());
+
+            FindIterable<Document> iterDoc = collection.find();
+
+            HashMap<String,List<String>> details=new HashMap<>();
+            System.out.print(filename+"\n");
+            for(Document doc:iterDoc){
+                String f=doc.get("Filename").toString();
+                //System.out.print(f+" ");
+
+                if(f.trim().equals(filename.trim())){
+                    ArrayList<String> props=new ArrayList<>();
+                    //System.out.print(doc.get("data"));
+                    Object dataObject = doc.get("data");
+                    Document data_doc=new Document();
+                    if (dataObject instanceof Document) {
+                        data_doc = (Document) dataObject;
+                    }
+
+                    for (Map.Entry<String, Object> entry : data_doc.entrySet()) {
+                        String blockId = entry.getKey();
+                        Document blockDocument = (Document) entry.getValue();
+        
+                        List<String> urlList = new ArrayList<>();
+                        for (Map.Entry<String, Object> urlEntry : blockDocument.entrySet()) {
+                            String hash=urlEntry.getKey();
+                            List<String> urls = (List<String>) urlEntry.getValue();
+                            urlList.add(hash);
+                            urlList.addAll(urls);
+                        }
+            
+                        System.out.print(blockId+"\n");
+
+                        for(String u:urlList){
+                            System.out.print(u+"\n");
+                        }
+
+                        details.put(blockId,urlList);
+                        
+                    }
+            
+                }
+
+            }
+
+
+
+        }
+        catch(Exception e){
+            System.out.print(e.getStackTrace());
+        }
+    }
+
+
+    @Override
+    public HashMap<String,ArrayList<String>> connect() {
+        ServerApi serverApi = ServerApi.builder()
+                .version(ServerApiVersion.V1)
+                .build();
+
+        MongoClientSettings settings=connect_todb();
 
         try (MongoClient mongoClient = MongoClients.create(settings)) {
             MongoDatabase database = mongoClient.getDatabase("Storage");
@@ -75,6 +152,7 @@ class MongoDBConnection implements DatabaseConnection {
     }
 }
 
+
 class DatabaseConnectionFactory {
     public static DatabaseConnection createConnection(String connectionString) {
 
@@ -106,8 +184,38 @@ class Namenode_server {
             }
         }
 
-        private void handleGetRequest(HttpExchange exchange) {
+        private void handleGetRequest(HttpExchange exchange) throws IOException{
+            String url=exchange.getRequestURI().toString();
+            //System.out.print(url);
+            String filename="";
+            try {
+                URI uri = new URI(url);
+                String query = uri.getQuery();
+                
+                if (query != null) {
+                    String[] params = query.split("&");
+                    for (String param : params) {
+                        String[] keyValue = param.split("=");
+                        if (keyValue.length == 2 && keyValue[0].equals("filename")) {
+                            filename = keyValue[1];
+                            break; 
+                        }
+                    }
+                } else {
+                    System.out.println("No query parameters found.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
+            System.out.print(filename);
+
+            MongoClientSettings settings=databaseConnection.connect_todb();
+
+
+            databaseConnection.fetch_blockdetails(settings,filename);
+
+            sendResponse(exchange, 200);
         }
 
         private void handlePostRequest(HttpExchange exchange) throws IOException {
