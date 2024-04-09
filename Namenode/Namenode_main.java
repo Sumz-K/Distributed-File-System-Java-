@@ -21,13 +21,14 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 interface DatabaseConnection {
     HashMap<String,ArrayList<String>> connect();
     MongoClientSettings connect_todb();
-    void fetch_blockdetails(MongoClientSettings settings,String filename);
+    HashMap<String,List<String>> fetch_blockdetails(MongoClientSettings settings,String filename);
 }
 
 class MongoDBConnection implements DatabaseConnection {
@@ -51,7 +52,8 @@ class MongoDBConnection implements DatabaseConnection {
         return settings;
     }
 
-    public void fetch_blockdetails(MongoClientSettings settings,String filename){
+    public HashMap<String,List<String>> fetch_blockdetails(MongoClientSettings settings,String filename){
+        HashMap<String,List<String>> details=new HashMap<>();
         try(MongoClient mongoclient=MongoClients.create(settings)){
             MongoDatabase database=mongoclient.getDatabase("Storage");
             MongoCollection<Document> collection=database.getCollection("Blocks to node mapping");
@@ -61,7 +63,7 @@ class MongoDBConnection implements DatabaseConnection {
 
             FindIterable<Document> iterDoc = collection.find();
 
-            HashMap<String,List<String>> details=new HashMap<>();
+            
             System.out.print(filename+"\n");
             for(Document doc:iterDoc){
                 String f=doc.get("Filename").toString();
@@ -88,11 +90,7 @@ class MongoDBConnection implements DatabaseConnection {
                             urlList.addAll(urls);
                         }
             
-                        System.out.print(blockId+"\n");
 
-                        for(String u:urlList){
-                            System.out.print(u+"\n");
-                        }
 
                         details.put(blockId,urlList);
                         
@@ -101,13 +99,17 @@ class MongoDBConnection implements DatabaseConnection {
                 }
 
             }
-
+            
 
 
         }
         catch(Exception e){
             System.out.print(e.getStackTrace());
+            
         }
+        return details;
+
+        
     }
 
 
@@ -213,7 +215,59 @@ class Namenode_server {
             MongoClientSettings settings=databaseConnection.connect_todb();
 
 
-            databaseConnection.fetch_blockdetails(settings,filename);
+            HashMap<String,List<String>> details=databaseConnection.fetch_blockdetails(settings,filename);
+
+            JSONArray arr=new JSONArray();
+
+            for (Map.Entry<String, List<String>> entry : details.entrySet()){
+                String key=entry.getKey();
+                List<String> value=entry.getValue();
+
+                //System.out.print(value.get(0)+"\n");
+
+                JSONObject jo=new JSONObject();
+                
+                try{
+                    jo.put("BlockID", key);
+                    jo.put("Hash", value.get(0));
+                    for(int i=1;i<value.size();i++){
+                        String datanode=value.get(i);
+
+                        //System.out.print(datanode+"\n");
+                        
+                        String nodenum="Node"+i;
+                        jo.put(nodenum, datanode);
+
+                    }
+                    arr.put(jo);
+
+                }catch(JSONException j){
+                    System.out.print(j.getStackTrace());
+                }
+
+                
+
+
+            }
+
+
+
+            for (int i = 0; i < arr.length(); i++) {
+                try {
+                    
+                    JSONObject obj = arr.getJSONObject(i);
+                    
+    
+                    System.out.println(obj.toString()+"\n");
+                } catch (JSONException e) {
+                    
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
 
             sendResponse(exchange, 200);
         }
