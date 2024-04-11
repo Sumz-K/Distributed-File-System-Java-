@@ -6,7 +6,9 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import com.mongodb.client.FindIterable;
 import java.io.*;
@@ -26,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 interface DatabaseConnection {
-    HashMap<String,ArrayList<String>> connect();
+    HashMap<String,ArrayList<String>> getNodedetails();
     MongoClientSettings connect_todb();
     HashMap<String,List<String>> fetch_blockdetails(MongoClientSettings settings,String filename);
 }
@@ -114,7 +116,7 @@ class MongoDBConnection implements DatabaseConnection {
 
 
     @Override
-    public HashMap<String,ArrayList<String>> connect() {
+    public HashMap<String,ArrayList<String>> getNodedetails() {
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
                 .build();
@@ -284,8 +286,7 @@ class Namenode_server {
             System.out.println("Received Post Body");
             System.out.println(body);
 
-
-            HashMap<String,ArrayList<String>> details=databaseConnection.connect();
+            HashMap<String,ArrayList<String>> details=databaseConnection.getNodedetails();
             ArrayList<String> useable_datanodes=new ArrayList<>();
             for (Map.Entry<String, ArrayList<String>> entry : details.entrySet()) {
                 String key = entry.getKey();
@@ -302,9 +303,20 @@ class Namenode_server {
             }
 
             sendDatanodeList(useable_datanodes,body);
-
-
+            
             sendResponse(exchange,200);
+        }
+
+        private void updateStorage(DatabaseConnection databaseConnection,String nodeName,double newStorage){
+            MongoClientSettings settings=databaseConnection.connect_todb();
+            try(MongoClient mongoClient=MongoClients.create(settings)){
+                MongoDatabase database = mongoClient.getDatabase("Storage");
+                MongoCollection<Document> collection = database.getCollection("Datanode info");
+
+                collection.updateOne(Filters.eq("Name", nodeName.trim()), Updates.set("AvailableStorage", newStorage));
+
+                System.out.println("Done updating");
+            }
         }
 
         private void sendDatanodeList(ArrayList<String> list,String body){
@@ -347,4 +359,4 @@ public class Namenode_main {
 
 
 
-// client->namenode->datanodemanager
+// client->namenode->datanodemanager                    
