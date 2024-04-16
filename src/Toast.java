@@ -16,18 +16,11 @@ public class Toast {
         lbl.setBorder(BorderFactory.createEmptyBorder(8, 8, 8,8));
         panel.setPreferredSize(new Dimension(200, 50));
         NoScalingIcon icon = new NoScalingIcon(
-                new ImageIcon("/Users/thalleencn/Desktop/Sem6/OOAD/PROJECT/FrontEnd/icons/check.png"));
+                new ImageIcon("icons\\check.png"));
         lbl.setIcon(icon);
         panel.setForeground(Color.WHITE);
         panel.setBackground(new Color(0,0,0,0));
         panel.add(lbl);
-        // if (this.type == 1)
-        //     panel.setBorder(new EtchedBorder(0, Color.GREEN, Color.GREEN));
-        // if (this.type == 2)
-        //     panel.setBorder(new EtchedBorder(0, Color.RED, Color.RED));
-        // win.add(panel);
-        // win.pack();
-        // win.setVisible(true);
     }
     
 

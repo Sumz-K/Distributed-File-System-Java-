@@ -33,7 +33,7 @@ public class Swap {
     }
     static void change_lable(String file,String metadata , String content) {
         file_nameva.setText(file);
-        addcard(file,"Meta",content);
+        addcard(file,metadata,content);
         
     }
 

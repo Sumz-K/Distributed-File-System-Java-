@@ -40,7 +40,7 @@ public class Searching {
         });
         JButton button = new JButton();
         NoScalingIcon icon = new NoScalingIcon(
-                new ImageIcon("/Users/thalleencn/Desktop/Sem6/OOAD/PROJECT/FrontEnd/icons/system-regular-42-search.png"));
+                new ImageIcon("icons\\system-regular-42-search.png"));
         button.setIcon(icon);
         button.setBorder(BorderFactory.createEmptyBorder(0, 100, 0, 0));
         button.setBorderPainted(false);
@@ -71,6 +71,9 @@ public class Searching {
             // parse it to get 
             // filecontents,
             // name,metadata
+            Request req = new Request();
+            req.get("http://127.0.0.1:8080/?filename=" + file_name);
+            System.out.println(req.reply_in_text());
         }
 
         searchField.setForeground(Color.lightGray);

@@ -50,7 +50,7 @@ class FileCard extends JPanel
 
         JButton del = new JButton();
         NoScalingIcon del_icon = new NoScalingIcon(
-                new ImageIcon("/Users/thalleencn/Desktop/Sem6/OOAD/PROJECT/FrontEnd/icons/delete.png"));
+                new ImageIcon("icons\\delete.png"));
         del.setIcon(del_icon);
         del.setOpaque(false);
         del.setBackground(new Color(0,0,0,0));
@@ -60,7 +60,10 @@ class FileCard extends JPanel
         del.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Code to execute when the button is clicked
-                System.out.println(" dlelte Button Clicked!"+encoded_string);
+                System.out.println(" dlelte Button Clicked!" + encoded_string);
+                // request to delete 
+                Request request = new Request();
+                request.get("http://127.0.0.1:8080/?filename="+filename);
             }
         });
 
@@ -68,7 +71,7 @@ class FileCard extends JPanel
         dwn.setOpaque(false);
         dwn.setBorder(null);
         NoScalingIcon dwn_icon = new NoScalingIcon(
-                new ImageIcon("/Users/thalleencn/Desktop/Sem6/OOAD/PROJECT/FrontEnd/icons/down.png"));
+                new ImageIcon("icons\\down.png"));
         dwn.setIcon(dwn_icon);
         dwn.setBackground(new Color(0,0,0,0));
         dwn.setForeground(new Color(0x38b6ff));
@@ -77,7 +80,7 @@ class FileCard extends JPanel
         dwn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Code to execute when the button is clicked
-                System.out.println(" download Button Clicked!"+encoded_string);
+                System.out.println(" download Button Clicked! "+encoded_string);
             }
         });
 

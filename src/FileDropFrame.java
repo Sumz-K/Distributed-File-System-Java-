@@ -7,9 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.datatransfer.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import javax.swing.border.Border;
@@ -52,7 +49,21 @@ public class FileDropFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 //System.out.println("pressed done button");
                 Request req = new Request();
-                //req.post("http://127.0.0.1:8080");
+                for (File file : fileList) {
+                    try {
+                        String contents = readFile(file);
+                        // System.out.println(contents);
+                        String fileName = file.getName();
+                        JSONObject jobj = new JSONObject();
+
+                        jobj.put("filename", fileName);
+                        jobj.put("contents", contents);
+                        req.post("http://127.0.0.1:8080", jobj);
+                    } catch (Exception ex) {
+                        System.out.println("file not find "+ex.getMessage());
+                    }
+                    
+                }
                 Swap.raise_toast(1);
                 
                 //System.out.println("raised toast");
@@ -145,13 +156,14 @@ public class FileDropFrame extends JFrame {
                                     dropPanel.repaint();
                                     try {
                                         String contents = readFile(file);
-                                        String fileName = file.getName();
+                                        // String fileName = file.getName();
+                                        // JSONObject jobj = new JSONObject();
+                                        // jobj.put("filename", fileName);
+                                        // jobj.put("contents", contents);
 
-                                        JSONObject jobj = new JSONObject();
-                                        jobj.put("filename", fileName);
-                                        jobj.put("contents", contents);
-                                        Request req = new Request();
-                                        req.post("http://127.0.0.1:8080",jobj);
+                                        // Request req = new Request();
+                                        // req.post("http://127.0.0.1:8080", jobj);
+                                        
                                     } catch (FileNotFoundException e1) {
                                         e1.printStackTrace();
                                     }
@@ -224,12 +236,5 @@ public class FileDropFrame extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize Nimbus");
-        }
-        SwingUtilities.invokeLater(FileDropFrame::new);
-    }
+
 }

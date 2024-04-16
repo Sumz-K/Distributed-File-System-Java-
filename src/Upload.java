@@ -20,7 +20,7 @@ public class Upload {
         btn.setFont(new Font("Trebuchet MS", Font.BOLD, 40));
         btn.setText("    Upload");
         NoScalingIcon icon = new NoScalingIcon(
-                new ImageIcon("/Users/thalleencn/Desktop/Sem6/OOAD/PROJECT/FrontEnd/icons/upload.png"));
+                new ImageIcon("icons\\upload.png"));
         btn.setIcon(icon);
         
         btn.setForeground(Color.WHITE);
@@ -32,26 +32,7 @@ public class Upload {
         ActionListener upload = new ActionListener() {
             public void actionPerformed(ActionEvent e)
             {
-                     
-                // onupload(() -> {
-
-                //     String ac = e.getActionCommand();
-                //     Toast t;
-                //     if (ac.equals("Success")) {
-                //     t = new Toast("Upload Successful", 1);
-                //     } else {
-                //     t = new Toast("Upload Failed", 2);
-                //     }
-
-                //     loc.add(t.panel);
-                //     t.display();
-                //     loc.revalidate();
-                //     loc.repaint();
-                    
-                // });
-                JFrame dnd = new FileDropFrame();
-                
-                
+                new FileDropFrame();
             }
         };
         
