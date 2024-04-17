@@ -72,7 +72,7 @@ public class Searching {
             // filecontents,
             // name,metadata
             Request req = new Request();
-            req.get("http://127.0.0.1:8080/?filename=" + file_name);
+            req.get("https://namenode-esdwt.run-ap-south1.goorm.site/receive?filename=" + file_name);
             System.out.println(req.reply_in_text());
         }
 

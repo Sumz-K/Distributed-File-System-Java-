@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import java.util.ArrayList;
 
 public class Request {
     public String reply;
@@ -101,7 +101,7 @@ public class Request {
         }
     }
 
-    public void post(String endpoint, ArrayList<JSONObject> data) {
+    public void post(String endpoint, JSONArray data) {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             HttpPost httpPost = new HttpPost(endpoint);
