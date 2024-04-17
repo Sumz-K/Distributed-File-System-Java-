@@ -80,7 +80,7 @@ class FileCard extends JPanel
         dwn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Code to execute when the button is clicked
-                System.out.println(" download Button Clicked! "+encoded_string);
+                System.out.println(" download Button Clicked! " + encoded_string);
             }
         });
 

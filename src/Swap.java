@@ -64,10 +64,12 @@ public class Swap {
 
         center.setPreferredSize(new Dimension(800, 800));
         center.setBackground(new Color(0x1d1d1d));
-        JScrollPane scrollPane = new JScrollPane(north_panel);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        // JScrollPane scrollPane = new JScrollPane(north_panel);
+        // scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        // scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        // north_panel.setSize(new Dimension(20, 20));
+        // center_panel.setSize(new Dimension(100,100));
+        frame.add(north_panel, BorderLayout.CENTER);
         // scrollbarthing();
 
         frame.revalidate();

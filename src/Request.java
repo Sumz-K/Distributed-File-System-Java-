@@ -4,17 +4,20 @@ import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import java.util.ArrayList;
 
-public class  Request {
+public class Request {
     public String reply;
     public JSONObject header;
     public int statusCode;
+
     public void set_header(JSONObject header) {
         this.header = header;
 
@@ -53,7 +56,7 @@ public class  Request {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             HttpPost httpPost = new HttpPost(endpoint);
-            
+
             if (header != null) {
                 Iterator<String> keys = header.keys();
                 while (keys.hasNext()) {
@@ -69,23 +72,18 @@ public class  Request {
             String filename = "";
 
             try {
-                for (String key : data.keySet()) {
-            System.out.println(key);
-        }
                 filename = data.get("filename").toString();
                 filename += ":";
-                System.out.println("Done getting filename");
                 String contents = data.get("contents").toString();
                 filename += contents;
-                System.out.println("Done getting contents");
+
                 filename += data.get("Endpoints").toString();
                 filename += ":";
-                
 
             } catch (Exception e) {
                 System.err.println("Failed to get 'filename' field from json object.");
             }
-            
+
             httpPost.setEntity(new StringEntity(filename));
             HttpResponse response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
@@ -102,7 +100,7 @@ public class  Request {
             this.reply = ("Error occurred while making the HTTP POST request: " + e.getMessage());
         }
     }
-    
+
     public void post(String endpoint, ArrayList<JSONObject> data) {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -121,10 +119,8 @@ public class  Request {
                 }
             }
             String filename = "";
-            
 
             try {
-
 
                 // Convert ArrayList to JSON string
                 filename = data.toString();
@@ -150,6 +146,35 @@ public class  Request {
         }
     }
 
+    public void delete(String url) {
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            HttpDelete httpdelte = new HttpDelete(url);
+            if (header != null) {
+                Iterator<String> keys = header.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    Object value = this.header.get(key);
+                    httpdelte.setHeader(key, value.toString());
+                }
+            }
+            HttpResponse response = httpClient.execute(httpdelte);
+            HttpEntity entity = response.getEntity();
+            this.statusCode = response.getStatusLine().getStatusCode();
+            if (entity != null) {
+                String responseBody = EntityUtils.toString(entity);
+                httpClient.close();
+                this.reply = responseBody;
+            } else {
+                httpClient.close();
+                this.reply = "Empty response received from the server.";
+            }
+        } catch (Exception e) {
+            this.reply = "Error in getting the response from the server. " + e.getMessage();
+        }
+
+    }
+
     public String reply_in_text() {
         return this.reply.toString();
     }
@@ -161,7 +186,6 @@ public class  Request {
         } catch (Exception e) {
             return null;
         }
-        
-        
+
     }
 }
