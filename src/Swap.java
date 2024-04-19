@@ -81,7 +81,7 @@ public class Swap {
     }
 
     static void addcard(String file, String meta, String content) {
-        center_panel.add(new FileCard(file, meta, file));
+        center_panel.add(new FileCard(file, meta, content));
         center_panel.revalidate();
         center_panel.repaint();
 

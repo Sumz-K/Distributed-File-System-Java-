@@ -52,13 +52,13 @@ public class FileDropFrame extends JFrame {
                 for (File file : fileList) {
                     try {
                         String contents = readFile(file);
-                        // System.out.println(contents);
                         String fileName = file.getName();
+                        // System.out.println(fileName + " " + contents);
                         JSONObject jobj = new JSONObject();
-
                         jobj.put("filename", fileName);
                         jobj.put("contents", contents);
-                        req.post("http://127.0.0.1:8080", jobj);
+                        req.post("https://namenode-esdwt.run-ap-south1.goorm.site/receive", jobj);
+                        System.out.println("resp" + req.reply_in_text());
                     } catch (Exception ex) {
                         System.out.println("file not find "+ex.getMessage());
                     }
@@ -66,7 +66,7 @@ public class FileDropFrame extends JFrame {
                 }
                 Swap.raise_toast(1);
                 
-                //System.out.println("raised toast");
+                System.out.println("raised toast");
                 dispose();
             }
         });

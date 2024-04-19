@@ -60,10 +60,11 @@ class FileCard extends JPanel
         del.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // Code to execute when the button is clicked
-                System.out.println(" dlelte Button Clicked!" + encoded_string);
+                System.out.println(" delete Button Clicked!" + encoded_string);
                 // request to delete 
                 Request request = new Request();
-                request.get("http://127.0.0.1:8080/?filename="+filename);
+                request.delete("https://namenode-esdwt.run-ap-south1.goorm.site/receive?filename=" + filename);
+                encoded_string = request.reply_in_text();
             }
         });
 
